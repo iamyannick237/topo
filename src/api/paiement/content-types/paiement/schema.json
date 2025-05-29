@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "paiements",
+  "info": {
+    "singularName": "paiement",
+    "pluralName": "paiements",
+    "displayName": "paiement"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "reservations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reservation.reservation",
+      "mappedBy": "paiement"
+    },
+    "montant": {
+      "type": "biginteger"
+    },
+    "mode": {
+      "type": "enumeration",
+      "enum": [
+        "Orange",
+        "MTN",
+        "Paypal"
+      ]
+    },
+    "statut": {
+      "type": "string"
+    }
+  }
+}
