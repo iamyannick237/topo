@@ -40,88 +40,240 @@ Strapi gives you many possible deployment options for your project including [St
 yarn strapi deploy
 ```
 
-## 📚 Learn more
+# 🎜️ App de Réservation de Billets — Documentation API (Frontend React Native)
 
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
+## 📆 Description du projet
 
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
+Cette application mobile permet aux utilisateurs de consulter des voyages, effectuer des réservations, et gérer leurs paiements. Le backend est développé avec **Strapi** (headless CMS) exposant des APIs REST, tandis que le frontend est développé avec **React Native**.
 
 ---
 
-=== APPLICATION MOBILE AVEC STRAPI & REACT NATIVE ===
+## 🚀 Stack Technique
 
-1. PRÉREQUIS
------------------------------
-- Node.js v18+
-- npm ou yarn
-- PostgreSQL/MySQL (pour Strapi)
-- Expo CLI (pour React Native)
+- **Backend :** Strapi ([http://localhost:1337](http://localhost:1337))
+- **Frontend :** React Native
+- **Communication :** REST API
 
-2. INSTALLATION
------------------------------
-# Backend (Strapi)
-git clone [URL_DU_PROJET]
-cd backend
-npm install
-cp .env.example .env
-# Editer le .env avec vos identifiants DB
+---
 
-# Frontend (React Native)
-cd ../frontend
-npm install
-cp .env.example .env
+## ⚙️ Base URL de l’API
 
-3. LANCEMENT
------------------------------
-# Backend
-npm run develop
-# Admin: http://localhost:1337/admin
+```js
+const API_URL = 'http://<TON_IP_LOCAL>:1337/api';
+// Exemple : http://192.168.1.100:1337/api
+```
 
-# Frontend
-npm start
-# Scanner le QR code avec Expo Go
+> 🚨 Utilise l'adresse IP locale de ton ordinateur pour que ton téléphone puisse accéder à Strapi en local.
 
-4. ENDPOINTS API
------------------------------
-GET    /api/articles       Liste des articles
-POST   /api/auth/local     Authentification
-GET    /api/products?populate=*  Produits avec médias
+---
 
-5. DÉPLOIEMENT
------------------------------
-# Backend (choisir une option):
-- Strapi Cloud: https://cloud.strapi.io
-- Heroku: git push heroku main
-- Docker: docker-compose up -d
+## 🔐 Authentification (plugin `users-permissions`)
 
-# Frontend:
-expo build:android  # Pour APK
-expo build:ios      # Pour iOS
+### ➕ Inscription
 
-6. STRUCTURE
------------------------------
-backend/
-  config/    # Configuration Strapi
-  src/api/   # Controllers & Modèles
-frontend/
-  src/screens/ # Écrans d'application
-  src/services/ # Appels API
+```http
+POST /api/auth/local/register
+```
 
-7. SUPPORT
------------------------------
-- Problèmes CORS: modifier config/middlewares.js
-- Réinitialisation DB: npm run strapi content-types:clear
+**Body :**
 
-=== FIN DU FICHIER ===
+```json
+{
+  "username": "john",
+  "email": "john@example.com",
+  "password": "123456"
+}
+```
 
+### 🔑 Connexion
+
+```http
+POST /api/auth/local
+```
+
+**Body :**
+
+```json
+{
+  "identifier": "john@example.com",
+  "password": "123456"
+}
+```
+
+**Réponse :**
+
+```json
+{
+  "jwt": "TOKEN",
+  "user": {
+    "id": 1,
+    "username": "john",
+    "email": "john@example.com"
+  }
+}
+```
+
+> Stocke le `jwt` pour les appels protégés dans `AsyncStorage` ou `SecureStore`.
+
+---
+
+## 📃 Collections disponibles
+
+| Collection     | Description               |
+| -------------- | ------------------------- |
+| `users`        | Utilisateurs              |
+| `voyages`      | Voyages disponibles       |
+| `reservations` | Billets réservés          |
+| `paiements`    | Paiements de réservations |
+
+---
+
+## 🌍 Endpoints REST par collection
+
+### 1. 🏓 Voyages (`/voyages`)
+
+#### 🔍 Liste des voyages
+
+```http
+GET /api/voyages
+```
+
+#### 🔍 Détails d'un voyage
+
+```http
+GET /api/voyages/:id
+```
+
+#### ➕ Créer un voyage (admin)
+
+```http
+POST /api/voyages
+Headers:
+Authorization: Bearer <jwt>
+
+Body :
+{
+  "titre": "Paris - Lyon",
+  "prix": 30,
+  "date_depart": "2025-07-01T09:00:00.000Z"
+}
+```
+
+---
+
+### 2. 🗓️ Réservations (`/reservations`)
+
+#### ➕ Créer une réservation
+
+```http
+POST /api/reservations
+Headers:
+Authorization: Bearer <jwt>
+
+Body :
+{
+  "voyage": 1,
+  "user": 2,
+  "places": 2
+}
+```
+
+#### 📅 Voir les réservations
+
+```http
+GET /api/reservations
+```
+
+> Pour filtrer : `?filters[user][id][$eq]=2`
+
+---
+
+### 3. 💳 Paiements (`/paiements`)
+
+#### ➕ Enregistrer un paiement
+
+```http
+POST /api/paiements
+Headers:
+Authorization: Bearer <jwt>
+
+Body :
+{
+  "reservation": 4,
+  "montant": 60,
+  "mode_paiement": "carte"
+}
+```
+
+---
+
+## 🔐 Exemple d'appel API sécurisé (React Native)
+
+```js
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const getVoyages = async () => {
+  const token = await AsyncStorage.getItem('jwt');
+  const res = await fetch(`${API_URL}/voyages`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  return data;
+};
+```
+
+---
+
+## 📈 Structure suggérée React Native
+
+```
+src/
+├── api/
+│   └── api.js         // appels axios centralisés
+├── screens/
+│   ├── LoginScreen.js
+│   ├── VoyageScreen.js
+│   ├── ReservationScreen.js
+│   └── PaiementScreen.js
+├── context/
+│   └── AuthContext.js
+└── components/
+    └── VoyageCard.js
+```
+
+---
+
+## 🔎 Librairies recommandées
+
+- `axios` : pour les appels API
+- `@react-native-async-storage/async-storage` : stocker le JWT
+- `react-navigation` : gestion des écrans
+- `formik` & `yup` : gestion des formulaires
+- `react-native-dotenv` : stocker les URL de façon propre
+
+---
+
+## 🧪 Bonnes pratiques
+
+- 🔁 Rafraîchir le token si expiré (401)
+- 🔒 Protège les routes sensibles avec JWT
+- 🛏️ Utilise Postman pour tester les routes avant le frontend
+- 📡 Gère les erreurs grâce à `try/catch`
+
+---
+
+## ✅ Permissions à configurer dans Strapi (Settings > Roles)
+
+- `GET /voyages`
+- `GET /reservations`
+- `POST /auth/local`
+- `POST /auth/local/register`
+- `POST /reservations`
+- `POST /paiements`
+
+---
+
+> Ce fichier README est conçu pour documenter tous les appels backend Strapi depuis un projet React Native. Il peut être enrichi si tu ajoutes d'autres collections ou relations (ex: images, villes, transporteurs, etc.).
 <sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
