@@ -50,7 +50,7 @@ Cette application mobile permet aux utilisateurs de consulter des voyages, effec
 
 ## 🚀 Stack Technique
 
-- **Backend :** Strapi ([http://localhost:1337](http://localhost:1337))
+- **Backend :** Strapi ([http://localhost:1337]([http://localhost:1337](https://dynamic-books-c66fc8ee97.strapiapp.com/)))
 - **Frontend :** React Native
 - **Communication :** REST API
 
