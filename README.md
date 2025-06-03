@@ -59,7 +59,7 @@ Cette application mobile permet aux utilisateurs de consulter des voyages, effec
 ## ⚙️ Base URL de l’API
 
 ```js
-const API_URL = 'http://<TON_IP_LOCAL>:1337/api';
+const API_URL = 'https://dynamic-books-c66fc8ee97.strapiapp.com//api';
 // Exemple : http://192.168.1.100:1337/api
 ```
 
